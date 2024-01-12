@@ -7,9 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (section === "compose") {
                 history.pushState({ section: section }, "", baseUrl);
                 compose_email();
-                send_email()
-
-
             }
             else {
                 history.pushState({ section: section }, "", baseUrl + '/' + section);
@@ -19,25 +16,25 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
     });
+    // default view
     load_mailbox('inbox');
 });
 
 window.onpopstate = function (event) {
-    console.log(event.state.section);
     load_mailbox(event.state.section);
+    location.reload();
 }
 
 function compose_email() {
-    console.log("starting");
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#show-email').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
 
     // Clear out composition fields
     document.querySelector('#compose-recipients').value = '';
     document.querySelector('#compose-subject').value = '';
     document.querySelector('#compose-body').value = '';
-    console.log("about to send");
     document.querySelector('#compose-form').addEventListener('submit', send_email);
 
 };
@@ -57,17 +54,27 @@ function load_mailbox(mailbox) {
 
             emails.forEach((email) => {
                 const element = document.createElement('div');
-                element.setAttribute("id", "singleEmail");
-                document.querySelector('#emails-view').append(element);
-                element.textContent = `${email.recipients}             ${email.subject}              ${email.timestamp}`
+                element.setAttribute("class", "singleEmail");
                 
+                element.addEventListener('click', function() {
+                    var emailId = email.id;
+                    element.setAttribute("data-id", email.id);
+                    const section = this.dataset.id;
+                    var baseUrl = "/emails";
+                    history.pushState({ section: section }, "", baseUrl + '/' + emailId);
+                    document.querySelector('#emails-view').style.display = 'none';
+                    document.querySelector('#show-email').style.display = 'block';
+                    document.querySelector('#compose-view').style.display = 'none';
+                    view_email(emailId);
+                });
+                document.querySelector('#emails-view').append(element);
+                element.textContent = `${email.recipients} ${email.subject} ${email.timestamp}`
             });
-
         });
-
 };
 
 function send_email(event) {
+    // stop form from submission then upate
     event.preventDefault();
     fetch('/emails', {
         method: 'POST',
@@ -81,8 +88,18 @@ function send_email(event) {
         .catch(error => {
             console.log('Error:', error);
         });
-
+    // load sent folder
     load_mailbox('sent');
 };
 
 
+function view_email(id) {
+    fetch(`/emails/${id}`)
+        .then(response => response.json())
+        .then(email => {
+            const element = document.createElement('div');
+            element.setAttribute('class', 'email')
+            element.textContent = email.body;
+            document.querySelector('#show-email').append(element);
+        });
+};
