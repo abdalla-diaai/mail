@@ -44,6 +44,7 @@ function load_mailbox(mailbox) {
     // Show the mailbox and hide other views
     document.querySelector('#emails-view').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
+    document.querySelector('#show-email').style.display = 'none';
 
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -55,20 +56,19 @@ function load_mailbox(mailbox) {
             emails.forEach((email) => {
                 const element = document.createElement('div');
                 element.setAttribute("class", "singleEmail");
-                
-                element.addEventListener('click', function() {
-                    var emailId = email.id;
-                    element.setAttribute("data-id", email.id);
-                    const section = this.dataset.id;
-                    var baseUrl = "/emails";
-                    history.pushState({ section: section }, "", baseUrl + '/' + emailId);
+                element.setAttribute("data-id", email.id);
+                element.addEventListener('click', function(event) {
+                    const emailId = event.target.dataset.id;
+                    const baseUrl = "/emails";
+                    history.replaceState({ 'emailId': emailId }, "", baseUrl + '/' + email.id);
                     document.querySelector('#emails-view').style.display = 'none';
                     document.querySelector('#show-email').style.display = 'block';
                     document.querySelector('#compose-view').style.display = 'none';
-                    view_email(emailId);
+                    view_email(emailId);    
+                    console.log(`why ${view_email(emailId)}`);                
                 });
+                element.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp}`;
                 document.querySelector('#emails-view').append(element);
-                element.textContent = `${email.recipients} ${email.subject} ${email.timestamp}`
             });
         });
 };
@@ -97,9 +97,12 @@ function view_email(id) {
     fetch(`/emails/${id}`)
         .then(response => response.json())
         .then(email => {
-            const element = document.createElement('div');
-            element.setAttribute('class', 'email')
-            element.textContent = email.body;
+            let element = document.createElement('div');
             document.querySelector('#show-email').append(element);
+            element.textContent = email;
+        })
+        .catch(error => {
+            console.error('Error fetching email:', error);
+            // Handle the error appropriately, e.g., display an error message to the user.
         });
 };
