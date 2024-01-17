@@ -6,3 +6,15 @@ textarea {
     border: solid 1px maroon;
     margin-block-end: 10px;
 }
+
+#body {
+    margin-block-start: 10px;
+    border-block-start: 1px solid black;
+    padding-block-start: 10px;
+}
+
+
+
+#reply-button {
+    margin: 10px;
+}
