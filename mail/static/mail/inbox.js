@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // default view
     loadMailbox('inbox');
 });
+  
+window.onpopstate = function(event) {
+    console.log(event.state.section);
+    loadMailbox(event.state.section);
+}
+
 
 var reply = false;
 
