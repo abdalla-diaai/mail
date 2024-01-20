@@ -63,8 +63,8 @@ function loadMailbox(mailbox) {
                 element.setAttribute("class", "singleEmail");
                 element.setAttribute("data-id", email.id);
                 const readSpan = document.createElement('span');
-                element.append(readSpan);
-                document.querySelector('#emails-view').append(element);
+                readSpan.classList.add('badge', 'text-bg-info');
+                element.appendChild(readSpan);
                 
                 // check mailbox
                 if (mailboxName.innerText.toLocaleLowerCase() === 'inbox' || mailboxName.innerText.toLocaleLowerCase() === 'archive') {
@@ -93,6 +93,7 @@ function loadMailbox(mailbox) {
                     viewEmail(emailId);
                 });
                 element.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp} ${readSpan.textContent}`;
+                document.querySelector('#emails-view').append(element);
             });
         });
 };
