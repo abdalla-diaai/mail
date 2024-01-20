@@ -1,8 +1,13 @@
+var reply = false;
 document.addEventListener('DOMContentLoaded', function () {
+    window.onpopstate = function (event) {
+        loadMailbox(event.state.section);
+    };
+    
     document.querySelectorAll('button').forEach(button => {
         button.onclick = function () {
             const section = this.dataset.section;
-            var baseUrl = "/emails";
+            const baseUrl = "http://127.0.0.1:8000/emails";
             if (section === "compose") {
                 history.pushState({ section: section }, "", baseUrl);
                 composeEmail();
@@ -12,17 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         };
     });
-    // default view
     loadMailbox('inbox');
 });
-  
-window.onpopstate = function(event) {
-    console.log(event.state.section);
-    loadMailbox(event.state.section);
-}
-
-
-var reply = false;
 
 function composeEmail(email, reply) {
     // Show compose view and hide other views
@@ -43,6 +39,9 @@ function composeEmail(email, reply) {
 };
 
 function loadMailbox(mailbox) {
+    // get current user
+    const currentUser = document.querySelector('#user-email').textContent;
+    var emailCounter = 0;
     // Show the mailbox and hide other views
     document.querySelector('#emails-view').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
@@ -50,32 +49,50 @@ function loadMailbox(mailbox) {
 
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+    const mailboxName = document.querySelector('h3');
     fetch(`/emails/${mailbox}`)
         .then(response => response.json())
         .then(emails => {
             emails.forEach((email) => {
+                // check counter and update the value
+                if (email.read === false) {
+                    emailCounter++;
+                };
+                document.querySelector('.badge').textContent = emailCounter;
                 const element = document.createElement('div');
                 element.setAttribute("class", "singleEmail");
                 element.setAttribute("data-id", email.id);
+                const readSpan = document.createElement('span');
+                element.append(readSpan);
                 document.querySelector('#emails-view').append(element);
-                if (email.read === 'false') {
-                    document.querySelector('.singleEmail').style.color = 'orange';
-                } else {
-                    document.querySelector('.singleEmail').style.color = 'grey';
-                }
+                
+                // check mailbox
+                if (mailboxName.innerText.toLocaleLowerCase() === 'inbox' || mailboxName.innerText.toLocaleLowerCase() === 'archive') {
+                    // check user
+                    if (email.read === false) {
+                        readSpan.textContent = "Unread";
+                    } else {
+                        readSpan.textContent = "Read";
+                    };               
+                };
                 element.addEventListener('click', function (event) {
+                    if (email.recipients == currentUser) {
+                        setTimeout(() => {
+                            emailRead(emailId, true);
+                        }, 500)
+                    };
                     const emailId = event.target.dataset.id;
                     const baseUrl = "/emails";
                     history.replaceState({ 'emailId': emailId }, "", baseUrl + '/' + email.id);
                     document.querySelector('#emails-view').style.display = 'none';
                     document.querySelector('#show-email').style.display = 'block';
                     document.querySelector('#compose-view').style.display = 'none';
+                    if (email.read === false) {
+                        emailCounter--;
+                    };
                     viewEmail(emailId);
-                    setTimeout(() => {
-                        emailRead(emailId, true);
-                    }, 500);
                 });
-                element.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp}`;
+                element.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp} ${readSpan.textContent}`;
             });
         });
 };
@@ -168,7 +185,7 @@ function viewEmail(id) {
                         setTimeout(() => {
                             loadMailbox('inbox');
                         }, 500);
-                        
+
                     };
                 } else {
                     archiveBtn.onclick = function () {
@@ -176,7 +193,7 @@ function viewEmail(id) {
                         setTimeout(() => {
                             loadMailbox('archive');
                         }, 500);
-                        
+
                     };
                 };
             };

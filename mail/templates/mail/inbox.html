@@ -4,7 +4,10 @@
 {% block body %}
     <h2 id="user-email">{{ request.user.email }}</h2>
 
-    <button data-section="inbox" class="btn btn-sm btn-outline-primary" id="inbox">Inbox</button>
+    <!-- <button data-section="inbox" class="btn btn-sm btn-outline-primary" id="inbox">Inbox</button> -->
+    <button data-section="inbox" type="button" class="btn btn-sm btn-outline-primary" id="inbox">
+        Inbox <span class="badge text-bg-secondary"></span>
+    </button>
     <button data-section="compose" class="btn btn-sm btn-outline-primary" id="compose">Compose</button>
     <button data-section="sent" class="btn btn-sm btn-outline-primary" id="sent">Sent</button>
     <button data-section="archive" class="btn btn-sm btn-outline-primary" id="archived">Archived</button>
