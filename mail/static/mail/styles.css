@@ -2,7 +2,7 @@ textarea {
     min-height: 400px;
 }
 
-.singleEmail {
+.single-email {
     border: solid 1px maroon;
     margin-block-end: 10px;
 }
@@ -17,4 +17,14 @@ textarea {
 
 #reply-button {
     margin: 10px;
+}
+
+.span {
+    margin-inline-end: 20px;
+}
+
+#emails-view {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
 }

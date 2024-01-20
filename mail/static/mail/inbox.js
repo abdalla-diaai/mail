@@ -59,12 +59,12 @@ function loadMailbox(mailbox) {
                     emailCounter++;
                 };
                 document.querySelector('.badge').textContent = emailCounter;
-                const element = document.createElement('div');
-                element.setAttribute("class", "singleEmail");
-                element.setAttribute("data-id", email.id);
+                const emailRow = document.createElement('div');
+                emailRow.setAttribute("class", "single-email");
+                emailRow.setAttribute("data-id", email.id);
                 const readSpan = document.createElement('span');
                 readSpan.classList.add('badge', 'text-bg-info');
-                element.appendChild(readSpan);
+                emailRow.appendChild(readSpan);
                 
                 // check mailbox
                 if (mailboxName.innerText.toLocaleLowerCase() === 'inbox' || mailboxName.innerText.toLocaleLowerCase() === 'archive') {
@@ -75,7 +75,7 @@ function loadMailbox(mailbox) {
                         readSpan.textContent = "Read";
                     };               
                 };
-                element.addEventListener('click', function (event) {
+                emailRow.addEventListener('click', function (event) {
                     if (email.recipients == currentUser) {
                         setTimeout(() => {
                             emailRead(emailId, true);
@@ -92,8 +92,8 @@ function loadMailbox(mailbox) {
                     };
                     viewEmail(emailId);
                 });
-                element.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp} ${readSpan.textContent}`;
-                document.querySelector('#emails-view').append(element);
+                emailRow.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp} ${readSpan.textContent}`;
+                document.querySelector('#emails-view').append(emailRow);
             });
         });
 };
