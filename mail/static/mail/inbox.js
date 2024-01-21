@@ -60,11 +60,10 @@ function loadMailbox(mailbox) {
                 };
                 document.querySelector('.badge').textContent = emailCounter;
                 const emailRow = document.createElement('div');
-                emailRow.setAttribute("class", "single-email");
+                emailRow.classList.add('col-9', 'single-email');
                 emailRow.setAttribute("data-id", email.id);
                 const readSpan = document.createElement('span');
-                readSpan.classList.add('badge', 'text-bg-info');
-                emailRow.appendChild(readSpan);
+                readSpan.classList.add('col-3', 'badge', 'text-bg-info');
                 
                 // check mailbox
                 if (mailboxName.innerText.toLocaleLowerCase() === 'inbox' || mailboxName.innerText.toLocaleLowerCase() === 'archive') {
@@ -92,8 +91,9 @@ function loadMailbox(mailbox) {
                     };
                     viewEmail(emailId);
                 });
-                emailRow.innerHTML = `${email.recipients} ${email.subject} ${email.timestamp} ${readSpan.textContent}`;
+                emailRow.innerHTML = `<strong>${email.recipients}</strong> ${email.subject} ${email.timestamp} ${readSpan.textContent}`;
                 document.querySelector('#emails-view').append(emailRow);
+
             });
         });
 };
@@ -186,7 +186,6 @@ function viewEmail(id) {
                         setTimeout(() => {
                             loadMailbox('inbox');
                         }, 500);
-
                     };
                 } else {
                     archiveBtn.onclick = function () {

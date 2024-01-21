@@ -19,9 +19,6 @@ textarea {
     margin: 10px;
 }
 
-.span {
-    margin-inline-end: 20px;
-}
 
 #emails-view {
     display: flex;
